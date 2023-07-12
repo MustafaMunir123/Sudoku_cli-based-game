@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <conio.h>
 
 using namespace std;
 
@@ -14,8 +15,7 @@ protected:
         gameName = new string(name);
     }
 
-    // virtual void About() = 0;
-    // virtual void GameMode() = 0;
+    virtual void About() = 0;
     // virtual void HowToPlay() = 0;
 
     // Destructor
@@ -62,7 +62,7 @@ class Sudoku : public Game {
     static const int board_size;
     static int board[9][9];
     Users *players;
-    int noOfPlayers;
+    int noOfPlayers = 0;
 
     public:
     Sudoku(){};
@@ -118,33 +118,59 @@ class Sudoku : public Game {
     }
 
     public:
- void printBoard() {
-    cout << "\nSudoku Board:\t";
-    for (int i = 0; i < noOfPlayers; i++) {
-        cout << this->players[i].getName() << ": " << players[i].getScore() << "\t";
+    void About(){
+        std::cout << "------------------------------------" << std::endl;
+        cout << "| ABOUT US |" << endl;
+        cout << "------------------------------------" << endl;
+        cout << endl;
+        cout << "We are Mustafa Munir and Azmeer Azhar, two students of NED University's" << endl;
+        cout << "Department of Computer Science. We have developed a C++ based SUDOKU game." << endl;
+        cout << endl;
+        cout << "Student Details:" << endl;
+        cout << "Mustafa Munir - CT-20302 - 3rd Year" << endl;
+        cout << "Azmeer Azhar - CT-20100 - 3rd Year" << endl;
+        cout << endl;
+        cout << "Our passion for programming and problem-solving led us to create this SUDOKU" << endl;
+        cout << "game as a way to showcase our skills and provide a challenging and enjoyable" << endl;
+        cout << "experience for players." << endl;
+        cout << endl;
+        cout << "We have put in a lot of effort and dedication into this project, implementing" << endl;
+        cout << "the game logic, user interface, and various features to ensure a seamless" << endl;
+        cout << "and engaging gameplay." << endl;
+        cout << endl;
+        cout << "We hope that our SUDOKU game brings joy to all the puzzle enthusiasts out there." << endl;
+        cout << "Thank you for your support!" << endl;
+        cout << "\nPress any [key] to continue" << endl;
+        getch();
     }
 
-    cout << "\n+-------+-------+-------+" << endl;
-    for (int i = 0; i < board_size; i++) {
-        if (i != 0 && i % 3 == 0) {
-            cout << "+-------+-------+-------+" << endl;
+    void printBoard() {
+        cout << "\nSudoku Board:\t";
+        for (int i = 0; i < noOfPlayers; i++) {
+            cout << this->players[i].getName() << ": " << players[i].getScore() << "\t";
         }
-        for (int j = 0; j < board_size; j++) {
-            if (j % 3 == 0) {
-                cout << "| ";
-            }
-            if (board[i][j] == 0){
-                cout << ". " ;
-            } else{
-            cout << board[i][j] << " ";
-            }
-        }
-        cout << "|" << endl;
-    }
-    cout << "+-------+-------+-------+" << endl;
-    cout << endl;
 
-}
+        cout << "\n+-------+-------+-------+" << endl;
+        for (int i = 0; i < board_size; i++) {
+            if (i != 0 && i % 3 == 0) {
+                cout << "+-------+-------+-------+" << endl;
+            }
+            for (int j = 0; j < board_size; j++) {
+                if (j % 3 == 0) {
+                    cout << "| ";
+                }
+                if (board[i][j] == 0){
+                    cout << ". " ;
+                } else{
+                cout << board[i][j] << " ";
+                }
+            }
+            cout << "|" << endl;
+        }
+        cout << "+-------+-------+-------+" << endl;
+        cout << endl;
+
+    }
 
 void startGame(){
     string name;
@@ -164,6 +190,37 @@ void startGame(){
     playerTurn();
 }
 
+void winningCriteria(bool playerLooses[]){
+    int lostCount = 0;
+    for (int i=0; i<noOfPlayers; i++){
+        if (playerLooses[i]){
+            lostCount += 1;
+        }
+    }
+
+    Users temp[noOfPlayers]; 
+    if (lostCount == noOfPlayers){
+        cout << "\nAll players loses !!!" << endl;
+    }else{
+        for (int i=0; i<noOfPlayers; i++){
+            if (!playerLooses[i]){
+                temp;
+            }
+        }
+    }
+};
+
+void Leaderboard(){
+    cout << "\n~~~~~~~~~ SUDOKU Leader Board ~~~~~~~~~" << endl;
+    if (noOfPlayers > 0) {
+        cout << noOfPlayers << endl;
+    for (int i=0; i<noOfPlayers; i++){
+        cout << i+1 << ". " << players[i].getName() << "\t" << players[i].getScore() << endl;
+        }
+    };
+    cout << "\nPress any [key] to continue" << endl;
+    getch();
+}
 
 void playerTurn() {
 
@@ -175,28 +232,29 @@ void playerTurn() {
     for (int i=0; i<noOfPlayers; i++){
         playerIncorrect[i] = 0;
     }
-    // int player2Incorrect = 0;
 
     while (!gameOver) {
         for (int i=0; i<noOfPlayers; i++){
 
             //Checks if players lost all 3 attemts 
             int lostCount = 0;
-            for (int i=0; i<noOfPlayers; i++){
-                if (playerIncorrect[i] == 3){
-                    lostCount += 1;
-                    cout << players[i].getName() << " loses" << endl;
-                    playerLoses[i] = true;
-                };
+            if (!gameOver){
+                for (int i=0; i<noOfPlayers; i++){
+                    if (playerIncorrect[i] == 3){
+                        lostCount += 1;
+                        cout << players[i].getName() << " loses" << endl;
+                        playerLoses[i] = true;
+                    };
+                }
             }
+
             // if all n players lost, game is over.
             if (lostCount == noOfPlayers){
                 gameOver = true;
             }
-            
-            printBoard();
 
             while (!playerLoses[i]) {
+                printBoard();
                 cout << "\n" << players[i].getName() << "'s Turn" << endl;
                 int row, column, input;
                 
@@ -224,7 +282,7 @@ void playerTurn() {
 
                     board[row][column] = input;
                     if (validBoard()) {
-                        printBoard();
+                        // printBoard();
                         players[i].incrementScore();
                         break;
                     } else {
@@ -261,13 +319,43 @@ int Sudoku::board[board_size][board_size] = {
 };
 
 int main() {
-
-    // Users mm("mm", 0);
-    // Users pp("pp", 0);
-
+    bool q = true;
+    int choice;
     Sudoku game;
+
+    while (q)
+    {   
+        system("cls");
+        cout << "\n-------------SUDOKU BOARD GAME-------------" << endl;
+        cout << "\n1. Start Game" << endl;
+        cout << "2. Leaderboard" << endl;
+        cout << "3. How to Play" << endl;
+        cout << "4. About Us" << endl;
+        cout << "5. Quit" << endl;
+        cout << ">> :";
+        cin >> choice;
+
+        switch (choice)
+        {
+        case 1:
+            game.startGame();
+            break;
+        case 2:
+            game.Leaderboard();
+            break;
+        case 3:
+            // 
+            break;
+        default:
+            cout << "\nNot a valid choice !!!" << endl;
+            break;
+        }
+
+    }
+    
+    
     // game.printBoard(mm , pp);
-    game.startGame();
+    
 
     return 0;
 };
