@@ -45,9 +45,9 @@ To compile and run the Sudoku game, follow these steps:
 🎉 The winner is determined based on the highest score achieved.
 
 ## About
-This Sudoku game was developed by Mustafa Munir and Azmeer Azhar, two passionate students from NED University's Department of Computer Science. Their goal was to create an engaging and challenging game that showcases their programming skills.
+This Sudoku game was developed by Mustafa Munir , student from NED University's Department of Computer Science. The goal was to create an engaging and challenging game that showcases their programming skills.
 
-🌟 We hope you enjoy playing Sudoku and have a great time with your friends! If you encounter any issues or have suggestions for improvement, please feel free to reach out.
+🌟 Hope you enjoy playing Sudoku and have a great time with your friends! If you encounter any issues or have suggestions for improvement, please feel free to reach out.
 
 ## Version History
 - v1.0.0: Initial release
