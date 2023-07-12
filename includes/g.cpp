@@ -1,6 +1,10 @@
 #include <iostream>
 #include <string>
 #include <conio.h>
+#include "Users.h"
+#include "Game.h"
+#include "Sudoku.h"
+
 
 using namespace std;
 
@@ -15,8 +19,9 @@ protected:
         gameName = new string(name);
     }
 
-    virtual void About() = 0;
-    // virtual void HowToPlay() = 0;
+    virtual void about() = 0;
+    virtual void howToPlay() = 0;
+    virtual void leaderboard() = 0;
 
     // Destructor
     virtual ~Game() {
@@ -24,39 +29,6 @@ protected:
     }
 };
 
-class Users {
-private:
-    string name;
-    int score;
-
-public:
-    Users(){}
-
-    Users(const string &Name) {
-        name = Name;
-        score = 0;
-    }
-
-    Users(const Users& obj) {
-        name = obj.name;
-        score = obj.score;
-    }
-
-    ~Users() {}
-
-    string getName() {
-        return this->name;
-    }
-
-    int getScore() const {
-        return this->score;
-    }
-
-    void incrementScore() {
-    this->score += 1;
-}
-
-};
 
 class Sudoku : public Game {
     static const int board_size;
@@ -118,10 +90,28 @@ class Sudoku : public Game {
     }
 
     public:
-    void About(){
-        std::cout << "------------------------------------" << std::endl;
-        cout << "| ABOUT US |" << endl;
-        cout << "------------------------------------" << endl;
+    void howToPlay() {
+            cout << "==========================" << endl;
+            cout << "       HOW TO PLAY        " << endl;
+            cout << "==========================" << endl;
+            cout << "1. Sudoku is played on a 9x9 grid." << endl;
+            cout << "2. The grid is divided into 9 smaller 3x3 grids." << endl;
+            cout << "3. The goal is to fill in the grid so that every row, column, and 3x3 grid contains the numbers 1-9, with no repeats." << endl;
+            cout << "4. Some numbers are already provided as clues." << endl;
+            cout << "5. You need to fill in the remaining empty cells with the correct numbers." << endl;
+            cout << "6. Use the numbers 1-9 to fill in the empty cells." << endl;
+            cout << "7. Each row, column, and 3x3 grid must contain the numbers 1-9 with no repeats." << endl;
+            cout << "8. The game is complete when the entire grid is filled correctly." << endl;
+            cout << "9. Good luck and enjoy playing Sudoku!" << endl;
+            cout << "==========================" << endl;
+            cout << "\nPress any [key] to continue" << endl;
+            getch();
+        }
+
+    void about(){
+        cout << "============================" << endl;
+        cout << "           ABOUT US         " << endl;
+        cout << "============================" << endl;
         cout << endl;
         cout << "We are Mustafa Munir and Azmeer Azhar, two students of NED University's" << endl;
         cout << "Department of Computer Science. We have developed a C++ based SUDOKU game." << endl;
@@ -190,36 +180,35 @@ void startGame(){
     playerTurn();
 }
 
-void winningCriteria(bool playerLooses[]){
-    int lostCount = 0;
-    for (int i=0; i<noOfPlayers; i++){
-        if (playerLooses[i]){
-            lostCount += 1;
-        }
-    }
-
-    Users temp[noOfPlayers]; 
-    if (lostCount == noOfPlayers){
-        cout << "\nAll players loses !!!" << endl;
-    }else{
-        for (int i=0; i<noOfPlayers; i++){
-            if (!playerLooses[i]){
-                temp;
-            }
-        }
-    }
-};
-
-void Leaderboard(){
+void leaderboard(){
     cout << "\n~~~~~~~~~ SUDOKU Leader Board ~~~~~~~~~" << endl;
     if (noOfPlayers > 0) {
-        cout << noOfPlayers << endl;
     for (int i=0; i<noOfPlayers; i++){
         cout << i+1 << ". " << players[i].getName() << "\t" << players[i].getScore() << endl;
         }
     };
     cout << "\nPress any [key] to continue" << endl;
     getch();
+}
+
+void checkWinner() {
+    int maxScore = 0;
+    int winnerIndex = -1;
+
+    for (int i = 0; i < noOfPlayers; i++) {
+        if (players[i].getScore() > maxScore) {
+            maxScore = players[i].getScore();
+            winnerIndex = i;
+        }
+    }
+
+    if (winnerIndex != -1) {
+        cout << "\n~~~~~~~~~ SUDOKU Winner ~~~~~~~~~" << endl;
+        cout << "Winner: " << players[winnerIndex].getName() << endl;
+        cout << "Score: " << players[winnerIndex].getScore() << endl;
+    } else {
+        cout << "\nNo winner. All players have the same score." << endl;
+    }
 }
 
 void playerTurn() {
@@ -242,8 +231,9 @@ void playerTurn() {
                 for (int i=0; i<noOfPlayers; i++){
                     if (playerIncorrect[i] == 3){
                         lostCount += 1;
-                        cout << players[i].getName() << " loses" << endl;
+                        cout << players[i].getName() << " has no more turns left" << endl;
                         playerLoses[i] = true;
+                        getch();
                     };
                 }
             }
@@ -284,7 +274,8 @@ void playerTurn() {
                     if (validBoard()) {
                         // printBoard();
                         players[i].incrementScore();
-                        break;
+                        // checkWinner();
+                        // break;
                     } else {
                         playerIncorrect[i]++;
                         cout << "\nWrong move!!! " << 3 - playerIncorrect[i] << " incorrect attempts left of player: " << players[i].getName() << endl;
@@ -301,6 +292,8 @@ void playerTurn() {
                 continue;
             }
         }
+    checkWinner();
+    getch();
     }
 
 };
@@ -327,12 +320,19 @@ int main() {
     {   
         system("cls");
         cout << "\n-------------SUDOKU BOARD GAME-------------" << endl;
-        cout << "\n1. Start Game" << endl;
-        cout << "2. Leaderboard" << endl;
-        cout << "3. How to Play" << endl;
-        cout << "4. About Us" << endl;
-        cout << "5. Quit" << endl;
-        cout << ">> :";
+        cout << "___________________________________________" << endl;
+        cout << "|  1. \t\tStart Game                |" << endl;
+        cout << "|_________________________________________|" << endl;
+        cout << "|  2. \t\tLeaderboard               |" << endl;
+        cout << "|_________________________________________|" << endl;
+        cout << "|  3. \t\tHow to Play               |" << endl;
+        cout << "|_________________________________________|" << endl;
+        cout << "|  4. \t\tAbout Us                  |" << endl;
+        cout << "|_________________________________________|" << endl;
+        cout << "|  5. \t\tQuit                      |" << endl;
+        cout << "|_________________________________________|" << endl;
+
+        cout << "\n  >> ";
         cin >> choice;
 
         switch (choice)
@@ -341,21 +341,24 @@ int main() {
             game.startGame();
             break;
         case 2:
-            game.Leaderboard();
+            game.leaderboard();
             break;
         case 3:
-            // 
+            game.howToPlay();
+            break;
+        case 4:
+            game.about();
+            break;
+        case 5:
+            q = false;
+            cout << "\nexiting . . ." << endl;
             break;
         default:
             cout << "\nNot a valid choice !!!" << endl;
             break;
         }
 
-    }
-    
-    
-    // game.printBoard(mm , pp);
-    
+    }    
 
     return 0;
 };
