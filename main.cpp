@@ -4,6 +4,7 @@
 #include "includes/Users.h"
 #include "includes/Game.h"
 #include "includes/Sudoku.h"
+#include "includes/custom_error.h"
 
 using namespace std;
 
@@ -31,29 +32,40 @@ int main() {
         cout << "\n  >> ";
         cin >> choice;
 
-        switch (choice)
-        {
-        case 1:
-            game.startGame();
-            break;
-        case 2:
-            game.leaderboard();
-            break;
-        case 3:
-            game.howToPlay();
-            break;
-        case 4:
-            game.about();
-            break;
-        case 5:
-            q = false;
-            cout << "\nexiting . . ." << endl;
-            break;
-        default:
-            cout << "\nNot a valid choice !!!" << endl;
-            break;
-        }
+        try{
+            if (cin.fail()){
+                throw CustomError("Error: expected a number got alphabet. Exiting ...");
+            }else{
+        
 
+                switch (choice)
+                {
+                case 1:
+                    game.startGame();
+                    break;
+                case 2:
+                    game.leaderboard();
+                    break;
+                case 3:
+                    game.howToPlay();
+                    break;
+                case 4:
+                    game.about();
+                    break;
+                case 5:
+                    q = false;
+                    cout << "\nexiting . . ." << endl;
+                    break;
+                default:
+                    cout << "\nNot a valid choice !!!" << endl;
+                    break;
+                }
+            }
+        }
+        catch(const CustomError& error) {
+            cout << error.getMessage() << std::endl;
+            break;
+            };
     }    
 
     return 0;

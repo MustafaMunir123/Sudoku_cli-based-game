@@ -1,7 +1,9 @@
 #include <iostream>
 #include <string>
 #include <conio.h>
+#include <limits>
 #include "sudoku.h"
+#include "custom_error.h"
 
 using namespace std;
 
@@ -144,19 +146,34 @@ void Sudoku::printBoard() {
 void Sudoku::startGame() {
     string name;
 
-    cout << "\nEnter no. of players (1-4): ";
-    cin >> noOfPlayers;
-    players = new Users[noOfPlayers];
+    try {
+        cout << "\nEnter no. of players (1-4): ";
+        if (!(cin >> noOfPlayers)) {
+            throw CustomError("Invalid input for number of players. Please enter a number.");
+        }
+        if (noOfPlayers < 1 || noOfPlayers > 4) {
+            throw CustomError("Invalid number of players. Please enter a number between 1 and 4.");
+        }
 
-    cout << "\nPlayers Info:" << endl;
-    for (int i = 0; i < noOfPlayers; i++) {
-        cout << "\nEnter name for Player " << i + 1 << ": ";
-        cin >> name;
-        players[i] = Users(name);
+        players = new Users[noOfPlayers];
+
+        cout << "\nPlayers Info:" << endl;
+        for (int i = 0; i < noOfPlayers; i++) {
+            cout << "\nEnter name for Player " << i + 1 << ": ";
+            if (!(cin >> name)) {
+                throw CustomError("Invalid input for player name. Please enter a valid name.");
+            }
+            players[i] = Users(name);
+        }
+
+        Sudoku::playerTurn();
+    } catch (const CustomError& error) {
+        cin.clear(); // Clear the error flag
+        cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Discard invalid input
+        cout << "Error: " << error.getMessage() << endl;
     }
-
-    Sudoku::playerTurn();
 }
+
 
 void Sudoku::leaderboard() {
     cout << "\n~~~~~~~~~ SUDOKU Leader Board ~~~~~~~~~" << endl;
@@ -222,40 +239,52 @@ void Sudoku::playerTurn() {
                 cout << "\n" << players[i].getName() << "'s Turn" << endl;
                 int row, column, input;
 
-                cout << "Select row (1-9): ";
-                cin >> row;
-                cout << "Select column (1-9): ";
-                cin >> column;
+                try {
+                    cout << "Select row (1-9): ";
+                    if (!(cin >> row)) {
+                        throw CustomError("Invalid input for row. Please enter a number.");
+                    }
 
-                // Adjust to 0-based index
-                row--;
-                column--;
+                    cout << "Select column (1-9): ";
+                    if (!(cin >> column)) {
+                        throw CustomError("Invalid input for column. Please enter a number.");
+                    }
 
-                if (row < 0 || row >= board_size || column < 0 || column >= board_size) {
-                    cout << "Invalid row or column. Please try again." << endl;
-                    continue;
-                }
+                    // Adjust to 0-based index
+                    row--;
+                    column--;
 
-                if (board[row][column] == 0) {
-                    cout << "Enter a number from 1-9: ";
-                    cin >> input;
-                    if (input < 1 || input > 9) {
-                        cout << "Invalid input. Please try again." << endl;
+                    if (row < 0 || row >= board_size || column < 0 || column >= board_size) {
+                        throw CustomError("Invalid row or column. Please try again.");
+                    }
+
+                    if (board[row][column] == 0) {
+                        cout << "Enter a number from 1-9: ";
+                        if (!(cin >> input)) {
+                            throw CustomError("Invalid input. Please enter a number.");
+                        }
+
+                        if (input < 1 || input > 9) {
+                            throw CustomError("Invalid input. Please enter a number from 1-9.");
+                        }
+
+                        board[row][column] = input;
+                        if (Sudoku::validBoard()) {
+                            players[i].incrementScore();
+                        } else {
+                            playerIncorrect[i]++;
+                            cout << "\nWrong move!!! " << 3 - playerIncorrect[i] << " incorrect attempts left for player: " << players[i].getName() << endl;
+                            board[row][column] = 0;
+                            break;
+                        }
+                    } else {
+                        cout << "\nCannot insert here!!!" << endl;
                         continue;
                     }
-
-                    board[row][column] = input;
-                    if (Sudoku::validBoard()) {
-                        players[i].incrementScore();
-                    } else {
-                        playerIncorrect[i]++;
-                        cout << "\nWrong move!!! " << 3 - playerIncorrect[i] << " incorrect attempts left for player: " << players[i].getName() << endl;
-                        board[row][column] = 0;
-                        break;
-                    }
-                } else {
-                    cout << "\nCannot insert here!!!" << endl;
-                    continue;
+                } catch (const CustomError& error) {
+                    cin.clear(); // Clear the error flag
+                    cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Discard invalid input
+                    cout << "Error: " << error.getMessage() << endl;
                 }
             }
 
@@ -268,3 +297,4 @@ void Sudoku::playerTurn() {
     Sudoku::checkWinner();
     getch();
 }
+
